@@ -43,9 +43,9 @@ static void update_title(NotepadWindow *self)
     gboolean modified = gtk_text_buffer_get_modified(self->buffer);
     char *title;
     if (modified)
-        title = g_strdup_printf("*%s - Notepad", name);
+        title = g_strdup_printf("*%s - Goshapps Notepad", name);
     else
-        title = g_strdup_printf("%s - Notepad", name);
+        title = g_strdup_printf("%s - Goshapps Notepad", name);
     gtk_window_set_title(GTK_WINDOW(self), title);
     g_free(title);
 }
@@ -544,7 +544,7 @@ action_about(GSimpleAction *action, GVariant *param, gpointer user_data)
     NotepadWindow *self = NOTEPAD_WINDOW(user_data);
 
     AdwAboutDialog *dlg = ADW_ABOUT_DIALOG(adw_about_dialog_new());
-    adw_about_dialog_set_application_name(dlg, "Notepad");
+    adw_about_dialog_set_application_name(dlg, "Goshapps Notepad");
     adw_about_dialog_set_version(dlg, "1.0");
     adw_about_dialog_set_comments(dlg, "A Windows 98 Notepad clone built with GTK4");
     adw_about_dialog_set_application_icon(dlg, "text-editor");
@@ -694,16 +694,60 @@ notepad_window_init(NotepadWindow *self)
 
     /* Window setup */
     gtk_window_set_default_size(GTK_WINDOW(self), 640, 480);
-    gtk_window_set_title(GTK_WINDOW(self), "Untitled - Notepad");
+    gtk_window_set_title(GTK_WINDOW(self), "Untitled - Goshapps Notepad");
 
     /* Actions */
     g_action_map_add_action_entries(G_ACTION_MAP(self),
                                     win_actions, G_N_ELEMENTS(win_actions), self);
 
     /* Menu bar */
-    char *ui_path = g_build_filename(g_get_current_dir(), "src", "menus.ui", NULL);
-    GtkBuilder *builder = gtk_builder_new_from_file(ui_path);
-    g_free(ui_path);
+    static const char menu_ui[] =
+        "<interface>"
+        "<menu id='menubar'>"
+        "  <submenu><attribute name='label'>_File</attribute>"
+        "    <section>"
+        "      <item><attribute name='label'>_New</attribute><attribute name='action'>win.new-file</attribute></item>"
+        "      <item><attribute name='label'>_Open...</attribute><attribute name='action'>win.open</attribute></item>"
+        "      <item><attribute name='label'>_Save</attribute><attribute name='action'>win.save</attribute></item>"
+        "      <item><attribute name='label'>Save _As...</attribute><attribute name='action'>win.save-as</attribute></item>"
+        "    </section><section>"
+        "      <item><attribute name='label'>_Print...</attribute><attribute name='action'>win.print</attribute></item>"
+        "    </section><section>"
+        "      <item><attribute name='label'>_Quit</attribute><attribute name='action'>win.quit</attribute></item>"
+        "    </section>"
+        "  </submenu>"
+        "  <submenu><attribute name='label'>_Edit</attribute>"
+        "    <section>"
+        "      <item><attribute name='label'>_Undo</attribute><attribute name='action'>win.undo</attribute></item>"
+        "    </section><section>"
+        "      <item><attribute name='label'>Cu_t</attribute><attribute name='action'>win.cut</attribute></item>"
+        "      <item><attribute name='label'>_Copy</attribute><attribute name='action'>win.copy</attribute></item>"
+        "      <item><attribute name='label'>_Paste</attribute><attribute name='action'>win.paste</attribute></item>"
+        "      <item><attribute name='label'>De_lete</attribute><attribute name='action'>win.delete</attribute></item>"
+        "    </section><section>"
+        "      <item><attribute name='label'>_Find...</attribute><attribute name='action'>win.find</attribute></item>"
+        "      <item><attribute name='label'>Find _Next</attribute><attribute name='action'>win.find-next</attribute></item>"
+        "      <item><attribute name='label'>_Replace...</attribute><attribute name='action'>win.replace</attribute></item>"
+        "      <item><attribute name='label'>_Go To...</attribute><attribute name='action'>win.goto</attribute></item>"
+        "    </section><section>"
+        "      <item><attribute name='label'>Select _All</attribute><attribute name='action'>win.select-all</attribute></item>"
+        "      <item><attribute name='label'>Time/_Date</attribute><attribute name='action'>win.time-date</attribute></item>"
+        "    </section>"
+        "  </submenu>"
+        "  <submenu><attribute name='label'>F_ormat</attribute>"
+        "    <section>"
+        "      <item><attribute name='label'>_Word Wrap</attribute><attribute name='action'>win.word-wrap</attribute></item>"
+        "      <item><attribute name='label'>_Font...</attribute><attribute name='action'>win.font</attribute></item>"
+        "    </section>"
+        "  </submenu>"
+        "  <submenu><attribute name='label'>_Help</attribute>"
+        "    <section>"
+        "      <item><attribute name='label'>_About Notepad</attribute><attribute name='action'>win.about</attribute></item>"
+        "    </section>"
+        "  </submenu>"
+        "</menu>"
+        "</interface>";
+    GtkBuilder *builder = gtk_builder_new_from_string(menu_ui, -1);
     GMenuModel *menubar = G_MENU_MODEL(gtk_builder_get_object(builder, "menubar"));
 
     GtkWidget *menu_bar = gtk_popover_menu_bar_new_from_model(menubar);
